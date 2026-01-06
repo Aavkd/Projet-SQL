@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cIAra Mobility - Database Visualizer</title>
+    <meta name="description"
+        content="Interactive dashboard for cIAra Mobility electric vehicle fleet management database">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- Mermaid -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader">
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <i class="fas fa-bolt loader-icon"></i>
+        </div>
+        <p class="loader-text">Chargement des données...</p>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Animated Background -->
+    <div class="bg-gradient"></div>
+    <div class="bg-particles" id="particles"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <div class="brand-icon">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <span class="brand-text">cIAra<span class="brand-accent">Mobility</span></span>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+
+        <div class="nav-links" id="navLinks">
+            <a href="#dashboard" class="nav-link active" data-section="dashboard" data-shortcut="1">
+                <i class="fas fa-chart-pie"></i>
+                <span>Dashboard</span>
+                <kbd class="shortcut-hint">1</kbd>
+            </a>
+            <a href="#map" class="nav-link" data-section="map" data-shortcut="2">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Carte</span>
+                <kbd class="shortcut-hint">2</kbd>
+            </a>
+            <a href="#fleet" class="nav-link" data-section="fleet" data-shortcut="3">
+                <i class="fas fa-car"></i>
+                <span>Flotte</span>
+                <kbd class="shortcut-hint">3</kbd>
+            </a>
+            <a href="#schema" class="nav-link" data-section="schema" data-shortcut="4">
+                <i class="fas fa-project-diagram"></i>
+                <span>Schéma DB</span>
+                <kbd class="shortcut-hint">4</kbd>
+            </a>
+        </div>
+
+        <div class="nav-actions">
+            <!-- Color Theme Picker -->
+            <div class="color-picker-wrapper">
+                <button class="color-picker-btn" id="colorPickerBtn" aria-label="Change accent color">
+                    <i class="fas fa-palette"></i>
+                </button>
+                <div class="color-picker-dropdown" id="colorPickerDropdown">
+                    <span class="dropdown-label">Couleur d'accent</span>
+                    <div class="color-options">
+                        <button class="color-option active" data-color="cyan" style="--option-color: #00d4ff"
+                            title="Cyan"></button>
+                        <button class="color-option" data-color="purple" style="--option-color: #a855f7"
+                            title="Violet"></button>
+                        <button class="color-option" data-color="pink" style="--option-color: #ec4899"
+                            title="Rose"></button>
+                        <button class="color-option" data-color="green" style="--option-color: #22c55e"
+                            title="Vert"></button>
+                        <button class="color-option" data-color="orange" style="--option-color: #f97316"
+                            title="Orange"></button>
+                        <button class="color-option" data-color="red" style="--option-color: #ef4444"
+                            title="Rouge"></button>
+                        <button class="color-option" data-color="gold" style="--option-color: #eab308"
+                            title="Or"></button>
+                        <button class="color-option" data-color="teal" style="--option-color: #14b8a6"
+                            title="Turquoise"></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme Toggle -->
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <i class="fas fa-sun" id="themeIconLight"></i>
+                <i class="fas fa-moon" id="themeIconDark"></i>
+                <span class="toggle-slider"></span>
+            </button>
+
+            <div class="nav-status">
+                <div class="status-dot"></div>
+                <span>Live Data</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div class="shortcuts-modal" id="shortcutsModal">
+        <div class="shortcuts-content">
+            <div class="shortcuts-header">
+                <h3><i class="fas fa-keyboard"></i> Raccourcis Clavier</h3>
+                <button class="close-btn" id="closeShortcuts">&times;</button>
+            </div>
+            <div class="shortcuts-list">
+                <div class="shortcut-item">
+                    <kbd>1</kbd>
+                    <span>Dashboard</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>2</kbd>
+                    <span>Carte France</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>3</kbd>
+                    <span>Explorateur Flotte</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>4</kbd>
+                    <span>Schéma DB</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>T</kbd>
+                    <span>Basculer thème</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>/</kbd>
+                    <span>Rechercher</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>?</kbd>
+                    <span>Afficher raccourcis</span>
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Esc</kbd>
+                    <span>Fermer modal</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Search Modal -->
+    <div class="advanced-search-modal" id="advancedSearchModal">
+        <div class="advanced-search-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-sliders-h"></i> Recherche Avancée</h3>
+                <button class="close-btn" id="closeAdvancedSearch">&times;</button>
+            </div>
+            <form class="advanced-search-form" id="advancedSearchForm">
+                <!-- Text Search -->
+                <div class="form-group full-width">
+                    <label><i class="fas fa-search"></i> Recherche textuelle</label>
+                    <input type="text" id="advSearchText" placeholder="Marque, modèle, immatriculation...">
+                </div>
+
+                <!-- Status Multi-select -->
+                <div class="form-group">
+                    <label><i class="fas fa-circle-notch"></i> États (multi-sélection)</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="status" value="Disponible" checked>
+                            <span class="checkmark disponible"></span>
+                            Disponible
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="status" value="En service" checked>
+                            <span class="checkmark en-service"></span>
+                            En service
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="status" value="En maintenance" checked>
+                            <span class="checkmark en-maintenance"></span>
+                            En maintenance
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="status" value="Hors service" checked>
+                            <span class="checkmark hors-service"></span>
+                            Hors service
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Cities Multi-select -->
+                <div class="form-group">
+                    <label><i class="fas fa-map-marker-alt"></i> Villes (multi-sélection)</label>
+                    <div class="multi-select-wrapper">
+                        <div class="multi-select-tags" id="cityTags">
+                            <span class="tag-placeholder">Toutes les villes</span>
+                        </div>
+                        <div class="multi-select-dropdown" id="cityDropdown">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Brands Multi-select -->
+                <div class="form-group">
+                    <label><i class="fas fa-industry"></i> Marques (multi-sélection)</label>
+                    <div class="multi-select-wrapper">
+                        <div class="multi-select-tags" id="brandTags">
+                            <span class="tag-placeholder">Toutes les marques</span>
+                        </div>
+                        <div class="multi-select-dropdown" id="brandDropdown">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Year Range -->
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Plage d'années</label>
+                    <div class="range-inputs">
+                        <input type="number" id="yearMin" placeholder="Min" min="2020" max="2026">
+                        <span class="range-separator">à</span>
+                        <input type="number" id="yearMax" placeholder="Max" min="2020" max="2026">
+                    </div>
+                    <div class="range-slider-container">
+                        <input type="range" id="yearRangeMin" min="2020" max="2026" value="2020" class="range-slider">
+                        <input type="range" id="yearRangeMax" min="2020" max="2026" value="2026" class="range-slider">
+                    </div>
+                </div>
+
+                <!-- Autonomy Range -->
+                <div class="form-group">
+                    <label><i class="fas fa-battery-three-quarters"></i> Plage d'autonomie (km)</label>
+                    <div class="range-inputs">
+                        <input type="number" id="autonomyMin" placeholder="Min" min="200" max="700">
+                        <span class="range-separator">à</span>
+                        <input type="number" id="autonomyMax" placeholder="Max" min="200" max="700">
+                    </div>
+                    <div class="range-slider-container">
+                        <input type="range" id="autonomyRangeMin" min="200" max="700" value="200" class="range-slider">
+                        <input type="range" id="autonomyRangeMax" min="200" max="700" value="700" class="range-slider">
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="clearAdvancedSearch">
+                        <i class="fas fa-eraser"></i> Effacer
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-search"></i> Rechercher
+                    </button>
+                </div>
+
+                <!-- Active Filters Summary -->
+                <div class="active-filters" id="activeFilters" style="display: none;">
+                    <span class="filters-label">Filtres actifs:</span>
+                    <div class="filter-tags" id="filterTags"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="section-header">
+                <h1 class="section-title">
+                    <span class="title-icon"><i class="fas fa-tachometer-alt"></i></span>
+                    Tableau de Bord
+                </h1>
+                <p class="section-subtitle">Vue d'ensemble de la flotte électrique cIAra Mobility</p>
+            </div>
+
+            <!-- KPI Cards with Skeleton Loading -->
+            <div class="kpi-grid">
+                <div class="kpi-card skeleton-parent" data-aos="fade-up">
+                    <div class="skeleton-loader"></div>
+                    <div class="kpi-icon gradient-cyan">
+                        <i class="fas fa-car-side"></i>
+                    </div>
+                    <div class="kpi-content">
+                        <span class="kpi-value" data-count="180">0</span>
+                        <span class="kpi-label">Véhicules Total</span>
+                    </div>
+                    <div class="kpi-trend positive">
+                        <i class="fas fa-arrow-up"></i> +12%
+                    </div>
+                </div>
+
+                <div class="kpi-card skeleton-parent" data-aos="fade-up" data-aos-delay="100">
+                    <div class="skeleton-loader"></div>
+                    <div class="kpi-icon gradient-green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="kpi-content">
+                        <span class="kpi-value" id="available-count" data-count="0">0</span>
+                        <span class="kpi-label">Disponibles</span>
+                    </div>
+                    <div class="kpi-trend positive">
+                        <i class="fas fa-arrow-up"></i> Optimal
+                    </div>
+                </div>
+
+                <div class="kpi-card skeleton-parent" data-aos="fade-up" data-aos-delay="200">
+                    <div class="skeleton-loader"></div>
+                    <div class="kpi-icon gradient-purple">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="kpi-content">
+                        <span class="kpi-value" data-count="10">0</span>
+                        <span class="kpi-label">Villes Couvertes</span>
+                    </div>
+                    <div class="kpi-progress">
+                        <div class="progress-bar" style="width: 100%"></div>
+                    </div>
+                </div>
+
+                <div class="kpi-card skeleton-parent" data-aos="fade-up" data-aos-delay="300">
+                    <div class="skeleton-loader"></div>
+                    <div class="kpi-icon gradient-orange">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="kpi-content">
+                        <span class="kpi-value" id="maintenance-count" data-count="0">0</span>
+                        <span class="kpi-label">En Maintenance</span>
+                    </div>
+                    <div class="kpi-trend warning">
+                        <i class="fas fa-wrench"></i> Active
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-grid">
+                <div class="chart-card large skeleton-parent">
+                    <div class="skeleton-loader chart-skeleton"></div>
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-bar"></i> Répartition par Ville</h3>
+                        <div class="chart-legend" id="city-legend"></div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="cityChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card skeleton-parent">
+                    <div class="skeleton-loader chart-skeleton"></div>
+                    <div class="chart-header">
+                        <h3><i class="fas fa-circle-notch"></i> État de la Flotte</h3>
+                    </div>
+                    <div class="chart-container doughnut">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Second Charts Row -->
+            <div class="charts-grid">
+                <div class="chart-card skeleton-parent">
+                    <div class="skeleton-loader chart-skeleton"></div>
+                    <div class="chart-header">
+                        <h3><i class="fas fa-industry"></i> Marques</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="brandChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card large skeleton-parent">
+                    <div class="skeleton-loader chart-skeleton"></div>
+                    <div class="chart-header">
+                        <h3><i class="fas fa-battery-three-quarters"></i> Distribution Autonomie (km)</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="autonomyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Map Section -->
+        <section id="map" class="section">
+            <div class="section-header">
+                <h1 class="section-title">
+                    <span class="title-icon"><i class="fas fa-map-marked-alt"></i></span>
+                    Carte de France
+                </h1>
+                <p class="section-subtitle">Distribution géographique des véhicules par ville</p>
+            </div>
+
+            <div class="map-container">
+                <div class="france-map-wrapper">
+                    <!-- SVG France Map -->
+                    <svg id="franceMap" viewBox="0 0 600 600" class="france-map">
+                        <!-- France hexagon outline (L'Hexagone - rotated 90°) -->
+                        <path class="france-outline" d="M150,100 L450,100 L550,300 L450,500 L150,500 L50,300 Z"
+                            fill="currentColor" stroke="var(--accent-cyan)" stroke-width="2"
+                            transform="rotate(90, 300, 300)" />
+
+                        <!-- City markers will be positioned by JS -->
+                        <g id="cityMarkers"></g>
+                    </svg>
+
+                    <!-- City Legend -->
+                    <div class="map-legend" id="mapLegend">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- City Details Panel -->
+                <div class="city-details-panel" id="cityDetailsPanel">
+                    <h3 class="panel-title">
+                        <i class="fas fa-info-circle"></i>
+                        <span id="selectedCityName">Sélectionnez une ville</span>
+                    </h3>
+                    <div class="city-stats" id="cityStats">
+                        <p class="hint-text">Cliquez sur une ville sur la carte pour voir les détails</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fleet Section -->
+        <section id="fleet" class="section">
+            <div class="section-header">
+                <h1 class="section-title">
+                    <span class="title-icon"><i class="fas fa-car"></i></span>
+                    Explorateur de Flotte
+                </h1>
+                <p class="section-subtitle">Parcourez et filtrez les 200 véhicules électriques</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput"
+                        placeholder="Rechercher marque, modèle, immatriculation... (Raccourci: /)">
+                </div>
+                <div class="filter-group">
+                    <select id="filterStatus" class="filter-select">
+                        <option value="">Tous les états</option>
+                        <option value="Disponible">🟢 Disponible</option>
+                        <option value="En service">🔵 En service</option>
+                        <option value="En maintenance">🟡 En maintenance</option>
+                        <option value="Hors service">🔴 Hors service</option>
+                    </select>
+                    <select id="filterCity" class="filter-select">
+                        <option value="">Toutes les villes</option>
+                    </select>
+                    <select id="filterBrand" class="filter-select">
+                        <option value="">Toutes les marques</option>
+                    </select>
+                </div>
+                <button class="advanced-search-btn" id="advancedSearchBtn">
+                    <i class="fas fa-sliders-h"></i>
+                    <span>Recherche avancée</span>
+                </button>
+                <div class="view-toggle">
+                    <button class="toggle-btn active" data-view="table"><i class="fas fa-list"></i></button>
+                    <button class="toggle-btn" data-view="cards"><i class="fas fa-th"></i></button>
+                </div>
+            </div>
+
+            <!-- Results Count -->
+            <div class="results-info">
+                <span id="resultsCount">200 véhicules</span>
+                <button class="btn-reset" id="resetFilters">
+                    <i class="fas fa-redo"></i> Réinitialiser
+                </button>
+            </div>
+
+            <!-- Table View -->
+            <div class="data-table-wrapper" id="tableView">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th data-sort="id">ID <i class="fas fa-sort"></i></th>
+                            <th data-sort="marque">Marque <i class="fas fa-sort"></i></th>
+                            <th data-sort="modele">Modèle <i class="fas fa-sort"></i></th>
+                            <th data-sort="annee">Année <i class="fas fa-sort"></i></th>
+                            <th data-sort="autonomie_km">Autonomie <i class="fas fa-sort"></i></th>
+                            <th data-sort="immatriculation">Immat. <i class="fas fa-sort"></i></th>
+                            <th data-sort="etat">État <i class="fas fa-sort"></i></th>
+                            <th data-sort="localisation">Ville <i class="fas fa-sort"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="vehicleTableBody">
+                        <!-- Skeleton rows -->
+                        <tr class="skeleton-row">
+                            <td>
+                                <div class="skeleton-cell"></div>
+                            </td>
+                            <td>
+                                <div class="skeleton-cell"></div>
+                            </td>
+                            <td>
+                                <div class="skeleton-cell"></div>
+                            </td>
+                            <td>
+                                <div class="skeleton-cell"></div>
+                            </td>
+                            <td>
+                                <div class="skeleton-cell"></div>
+                            </td>
+                            <td>
+                                <div class="skeleton-cell"></div>
+                            </td>
+                            <td>
+                                <div class="skeleton-cell"></div>
+                            </td>
+                            <td>
+                                <div class="skeleton-cell"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cards View -->
+            <div class="cards-grid" id="cardsView" style="display: none;">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <!-- Schema Section -->
+        <section id="schema" class="section">
+            <div class="section-header">
+                <h1 class="section-title">
+                    <span class="title-icon"><i class="fas fa-database"></i></span>
+                    Schéma de Base de Données
+                </h1>
+                <p class="section-subtitle">Modèle Conceptuel de Données (MCD) - PostgreSQL</p>
+            </div>
+
+            <div class="schema-container">
+                <div class="schema-info-cards">
+                    <div class="info-card">
+                        <i class="fas fa-table"></i>
+                        <span class="info-value">9</span>
+                        <span class="info-label">Tables</span>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-link"></i>
+                        <span class="info-value">10</span>
+                        <span class="info-label">Relations</span>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-database"></i>
+                        <span class="info-value">PostgreSQL</span>
+                        <span class="info-label">SGBD</span>
+                    </div>
+                </div>
+
+                <div class="mermaid-wrapper">
+                    <div class="mermaid" id="erDiagram">
+                        erDiagram
+                        TYPES_VEHICULES ||--o{ VEHICULES : "categorise"
+                        STATIONS ||--o{ VEHICULES : "stationne"
+                        STATIONS ||--o{ BORNES : "possede"
+                        CLIENTS ||--o{ LOCATIONS : "effectue"
+                        VEHICULES ||--o{ LOCATIONS : "concerne"
+                        LOCATIONS ||--|| PAIEMENTS : "genere"
+                        TECHNICIENS ||--o{ INTERVENTIONS : "realise"
+                        VEHICULES ||--o{ INTERVENTIONS : "subit"
+                        BORNES ||--o{ SESSIONS_RECHARGE : "alimente"
+                        VEHICULES ||--o{ SESSIONS_RECHARGE : "recharge"
+
+                        TYPES_VEHICULES {
+                        int id_type PK
+                        string libelle
+                        decimal tarif_minute
+                        decimal tarif_km
+                        }
+
+                        VEHICULES {
+                        int id_vehicule PK
+                        int id_type FK
+                        int id_station FK
+                        string marque
+                        string modele
+                        int annee
+                        int autonomie_km
+                        string immatriculation UK
+                        string etat
+                        }
+
+                        STATIONS {
+                        int id_station PK
+                        string nom
+                        string ville
+                        string adresse
+                        int capacite
+                        decimal latitude
+                        decimal longitude
+                        }
+
+                        BORNES {
+                        int id_borne PK
+                        int id_station FK
+                        string type_connecteur
+                        decimal puissance_kw
+                        string statut
+                        }
+
+                        CLIENTS {
+                        int id_client PK
+                        string nom
+                        string prenom
+                        string email UK
+                        date date_naissance
+                        boolean actif
+                        }
+
+                        TECHNICIENS {
+                        int id_technicien PK
+                        string nom
+                        string prenom
+                        string specialite
+                        date date_embauche
+                        }
+
+                        LOCATIONS {
+                        int id_location PK
+                        int id_client FK
+                        int id_vehicule FK
+                        datetime date_debut
+                        datetime date_fin
+                        decimal distance_km
+                        string statut
+                        }
+
+                        PAIEMENTS {
+                        int id_paiement PK
+                        int id_location FK
+                        decimal montant
+                        string methode
+                        string statut
+                        }
+
+                        INTERVENTIONS {
+                        int id_intervention PK
+                        int id_vehicule FK
+                        int id_technicien FK
+                        string type_intervention
+                        decimal cout
+                        string statut
+                        }
+
+                        SESSIONS_RECHARGE {
+                        int id_session PK
+                        int id_vehicule FK
+                        int id_borne FK
+                        datetime date_debut
+                        decimal energie_kwh
+                        }
+                    </div>
+                </div>
+
+                <!-- Tables Summary -->
+                <div class="tables-summary">
+                    <h3><i class="fas fa-list-alt"></i> Résumé des Tables</h3>
+                    <div class="tables-grid">
+                        <div class="table-info-card">
+                            <div class="table-icon"><i class="fas fa-car"></i></div>
+                            <div class="table-details">
+                                <span class="table-name">vehicules</span>
+                                <span class="table-count">200 lignes</span>
+                            </div>
+                        </div>
+                        <div class="table-info-card">
+                            <div class="table-icon"><i class="fas fa-charging-station"></i></div>
+                            <div class="table-details">
+                                <span class="table-name">stations</span>
+                                <span class="table-count">10 lignes</span>
+                            </div>
+                        </div>
+                        <div class="table-info-card">
+                            <div class="table-icon"><i class="fas fa-plug"></i></div>
+                            <div class="table-details">
+                                <span class="table-name">bornes</span>
+                                <span class="table-count">25 lignes</span>
+                            </div>
+                        </div>
+                        <div class="table-info-card">
+                            <div class="table-icon"><i class="fas fa-users"></i></div>
+                            <div class="table-details">
+                                <span class="table-name">clients</span>
+                                <span class="table-count">15 lignes</span>
+                            </div>
+                        </div>
+                        <div class="table-info-card">
+                            <div class="table-icon"><i class="fas fa-user-cog"></i></div>
+                            <div class="table-details">
+                                <span class="table-name">techniciens</span>
+                                <span class="table-count">5 lignes</span>
+                            </div>
+                        </div>
+                        <div class="table-info-card">
+                            <div class="table-icon"><i class="fas fa-route"></i></div>
+                            <div class="table-details">
+                                <span class="table-name">locations</span>
+                                <span class="table-count">25 lignes</span>
+                            </div>
+                        </div>
+                        <div class="table-info-card">
+                            <div class="table-icon"><i class="fas fa-credit-card"></i></div>
+                            <div class="table-details">
+                                <span class="table-name">paiements</span>
+                                <span class="table-count">25 lignes</span>
+                            </div>
+                        </div>
+                        <div class="table-info-card">
+                            <div class="table-icon"><i class="fas fa-wrench"></i></div>
+                            <div class="table-details">
+                                <span class="table-name">interventions</span>
+                                <span class="table-count">13 lignes</span>
+                            </div>
+                        </div>
+                        <div class="table-info-card">
+                            <div class="table-icon"><i class="fas fa-bolt"></i></div>
+                            <div class="table-details">
+                                <span class="table-name">sessions_recharge</span>
+                                <span class="table-count">15 lignes</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <i class="fas fa-bolt"></i>
+                <span>cIAra Mobility</span>
+            </div>
+            <div class="footer-info">
+                <span>Projet SQL B2 - Ynov 2025-2026</span>
+                <span class="separator">•</span>
+                <span>PostgreSQL Database Visualizer</span>
+                <span class="separator">•</span>
+                <span class="shortcut-tip"><kbd>?</kbd> pour les raccourcis</span>
+            </div>
+            <div class="footer-date">
+                <i class="fas fa-calendar"></i>
+                <span id="currentDate"></span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+# Fichiers ignorés par Git
+
+# Base de données
+*.db
+*.sqlite
+*.sql.bak
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Fichiers temporaires
+*.tmp
+*.temp
+*~
+
+# Node modules (si utilisé pour des outils)
+node_modules/
+
+# Variables d'environnement
+.env
+.env.local
+
+# Backups
+*.backup
+*.bak

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cIAra Mobility - Database Dashboard</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #316192;
+            --secondary-color: #4479A1;
+            --accent-color: #2ecc71;
+            --bg-light: #f8f9fa;
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: white !important;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .kpi-icon {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            opacity: 0.8;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: var(--primary-color);
+        }
+
+        .nav-pills .nav-link {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        /* Mermaid Diagram Styling */
+        .mermaid-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            text-align: center;
+        }
+
+        /* Table Styling */
+        .table-responsive {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .badge-available { background-color: #2ecc71; color: white; }
+        .badge-maintenance { background-color: #f1c40f; color: black; }
+        .badge-unavailable { background-color: #e74c3c; color: white; }
+
+        footer {
+            margin-top: 50px;
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-car-battery me-2"></i>cIAra Mobility DB
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#" onclick="showSection('dashboard')">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#" onclick="showSection('schema')">Schéma (MCD)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#" onclick="showSection('dictionary')">Dictionnaire</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#" onclick="showSection('data')">Données</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+
+        <div id="dashboard-section">
+            <h2 class="mb-4">Vue d'ensemble</h2>
+            
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted text-uppercase">Véhicules</h6>
+                                <h2 class="mb-0">189</h2>
+                            </div>
+                            <div class="kpi-icon"><i class="fas fa-car"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted text-uppercase">Stations</h6>
+                                <h2 class="mb-0">12</h2>
+                            </div>
+                            <div class="kpi-icon"><i class="fas fa-charging-station"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted text-uppercase">Locations Actives</h6>
+                                <h2 class="mb-0">42</h2>
+                            </div>
+                            <div class="kpi-icon"><i class="fas fa-route"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted text-uppercase">Incidents</h6>
+                                <h2 class="mb-0 text-danger">5</h2>
+                            </div>
+                            <div class="kpi-icon text-danger"><i class="fas fa-tools"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card p-4">
+                        <h5 class="card-title">État de la Flotte</h5>
+                        <canvas id="fleetStatusChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card p-4">
+                        <h5 class="card-title">Véhicules par Ville</h5>
+                        <canvas id="cityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="schema-section" style="display: none;">
+            <h2 class="mb-4">Modèle Conceptuel (MCD)</h2>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Diagramme généré dynamiquement à partir de la structure PostgreSQL.
+            </div>
+            <div class="mermaid-container shadow-sm">
+                <div class="mermaid">
+erDiagram
+    TYPES_VEHICULES ||--o{ VEHICULES : categorise
+    STATIONS ||--o{ BORNES : possede
+    STATIONS ||--o{ VEHICULES : stationne
+    CLIENTS ||--o{ LOCATIONS : effectue
+    VEHICULES ||--o{ LOCATIONS : concerne
+    LOCATIONS ||--|| PAIEMENTS : genere
+    TECHNICIENS ||--o{ INTERVENTIONS : realise
+    VEHICULES ||--o{ INTERVENTIONS : subit
+    BORNES ||--o{ SESSIONS_RECHARGE : alimente
+    VEHICULES ||--o{ SESSIONS_RECHARGE : recharge
+    
+    TYPES_VEHICULES {
+        int id_type PK
+        string libelle
+        decimal tarif_minute
+    }
+    VEHICULES {
+        int id_vehicule PK
+        string marque
+        string modele
+        string etat
+        int autonomie_km
+    }
+    STATIONS {
+        int id_station PK
+        string nom
+        string ville
+        int capacite
+    }
+    LOCATIONS {
+        int id_location PK
+        datetime date_debut
+        datetime date_fin
+    }
+    CLIENTS {
+        int id_client PK
+        string nom
+        string email
+    }
+                </div>
+            </div>
+        </div>
+
+        <div id="dictionary-section" style="display: none;">
+            <h2 class="mb-4">Dictionnaire de Données</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="list-group" id="list-tab" role="tablist">
+                        <a class="list-group-item list-group-item-action active" data-bs-toggle="list" href="#dict-vehicules">VEHICULES</a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#dict-stations">STATIONS</a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#dict-clients">CLIENTS</a>
+                        <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#dict-locations">LOCATIONS</a>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="dict-vehicules">
+                            <div class="card p-3">
+                                <h4>VEHICULES</h4>
+                                <p class="text-muted">Table principale contenant la flotte de véhicules.</p>
+                                <table class="table table-striped table-hover">
+                                    <thead><tr><th>Attribut</th><th>Type</th><th>Description</th></tr></thead>
+                                    <tbody>
+                                        <tr><td>id_vehicule</td><td>SERIAL (PK)</td><td>Identifiant unique</td></tr>
+                                        <tr><td>id_type</td><td>INT (FK)</td><td>Référence type véhicule</td></tr>
+                                        <tr><td>marque</td><td>VARCHAR</td><td>Marque constructeur</td></tr>
+                                        <tr><td>modele</td><td>VARCHAR</td><td>Modèle véhicule</td></tr>
+                                        <tr><td>etat</td><td>VARCHAR</td><td>Disponible, En maintenance, etc.</td></tr>
+                                        <tr><td>autonomie_km</td><td>INT</td><td>Autonomie actuelle</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="dict-stations">
+                             <div class="card p-3">
+                                <h4>STATIONS</h4>
+                                <p class="text-muted">Points de stationnement et de recharge.</p>
+                                <table class="table table-striped table-hover">
+                                    <thead><tr><th>Attribut</th><th>Type</th><th>Description</th></tr></thead>
+                                    <tbody>
+                                        <tr><td>id_station</td><td>SERIAL (PK)</td><td>Identifiant unique</td></tr>
+                                        <tr><td>nom</td><td>VARCHAR</td><td>Nom commercial</td></tr>
+                                        <tr><td>ville</td><td>VARCHAR</td><td>Ville de localisation</td></tr>
+                                        <tr><td>capacite</td><td>INT</td><td>Nombre de places total</td></tr>
+                                        <tr><td>latitude/longitude</td><td>DECIMAL</td><td>Coordonnées GPS</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="dict-clients">
+                            <div class="card p-3"><h4>CLIENTS</h4><p>Utilisateurs enregistrés.</p></div>
+                        </div>
+                        <div class="tab-pane fade" id="dict-locations">
+                            <div class="card p-3"><h4>LOCATIONS</h4><p>Historique des trajets.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="data-section" style="display: none;">
+            <h2 class="mb-4">Explorateur de Données</h2>
+            
+            <ul class="nav nav-tabs mb-3" id="dataTab" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#data-vehicules">Véhicules (Aperçu)</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#data-stations">Stations</button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="data-vehicules">
+                    <div class="table-responsive shadow-sm">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Marque/Modèle</th>
+                                    <th>Immatriculation</th>
+                                    <th>Énergie</th>
+                                    <th>Autonomie</th>
+                                    <th>État</th>
+                                    <th>Ville</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td><strong>Kia</strong> EV6</td>
+                                    <td>XR-964-LJ</td>
+                                    <td>Electrique</td>
+                                    <td>320 km</td>
+                                    <td><span class="badge badge-maintenance">En maintenance</span></td>
+                                    <td>Strasbourg</td>
+                                </tr>
+                                <tr>
+                                    <td>8</td>
+                                    <td><strong>Nissan</strong> Leaf</td>
+                                    <td>SO-650-ZD</td>
+                                    <td>Electrique</td>
+                                    <td>270 km</td>
+                                    <td><span class="badge badge-available">Disponible</span></td>
+                                    <td>Lyon</td>
+                                </tr>
+                                <tr>
+                                    <td>10</td>
+                                    <td><strong>Renault</strong> Megane E-Tech</td>
+                                    <td>YE-951-QU</td>
+                                    <td>Electrique</td>
+                                    <td>550 km</td>
+                                    <td><span class="badge badge-available">Disponible</span></td>
+                                    <td>Montpellier</td>
+                                </tr>
+                                <tr>
+                                    <td>186</td>
+                                    <td><strong>Tesla</strong> Model Y</td>
+                                    <td>NN-119-YJ</td>
+                                    <td>Electrique</td>
+                                    <td>290 km</td>
+                                    <td><span class="badge badge-available">Disponible</span></td>
+                                    <td>Nantes</td>
+                                </tr>
+                                <tr>
+                                    <td>187</td>
+                                    <td><strong>Volkswagen</strong> ID.3</td>
+                                    <td>RV-850-FT</td>
+                                    <td>Electrique</td>
+                                    <td>450 km</td>
+                                    <td><span class="badge badge-unavailable">Hors service</span></td>
+                                    <td>Montpellier</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="data-stations">
+                    <div class="table-responsive shadow-sm">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nom Station</th>
+                                    <th>Ville</th>
+                                    <th>Adresse</th>
+                                    <th>Capacité</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>Station Gare Paris Nord</td><td>Paris</td><td>18 Rue de Dunkerque</td><td>30</td></tr>
+                                <tr><td>2</td><td>Station Bellecour</td><td>Lyon</td><td>Place Bellecour</td><td>25</td></tr>
+                                <tr><td>3</td><td>Station Vieux-Port</td><td>Marseille</td><td>Quai des Belges</td><td>20</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 cIAra Mobility. Internal Tool. <br>Generated based on SQL v1.0</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+
+    <script>
+        // Initialize Mermaid
+        // NOTE: The schema section is hidden by default. Rendering Mermaid while its container is
+        // display:none can produce NaN layout coordinates (e.g. SVG path "Expected number").
+        // So we render Mermaid manually when the section becomes visible.
+        mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+
+        let schemaMermaidRendered = false;
+
+        async function renderSchemaMermaid(force = false) {
+            const schemaSection = document.getElementById('schema-section');
+            if (!schemaSection) return;
+
+            const nodes = Array.from(schemaSection.querySelectorAll('.mermaid'));
+            if (nodes.length === 0) return;
+
+            if (schemaMermaidRendered && !force) return;
+
+            // Preserve the original Mermaid source, then reset before re-render.
+            for (const node of nodes) {
+                if (!node.dataset.mermaidSource) {
+                    node.dataset.mermaidSource = node.textContent;
+                }
+                node.removeAttribute('data-processed');
+                node.innerHTML = node.dataset.mermaidSource;
+            }
+
+            // Wait a tick so layout has real dimensions.
+            await new Promise(requestAnimationFrame);
+
+            try {
+                await mermaid.run({ nodes });
+                schemaMermaidRendered = true;
+            } catch (err) {
+                console.error('Mermaid render failed:', err);
+            }
+        }
+
+        // Navigation Logic
+        function showSection(sectionId) {
+            // Hide all sections
+            document.getElementById('dashboard-section').style.display = 'none';
+            document.getElementById('schema-section').style.display = 'none';
+            document.getElementById('dictionary-section').style.display = 'none';
+            document.getElementById('data-section').style.display = 'none';
+            
+            // Show requested section
+            document.getElementById(sectionId + '-section').style.display = 'block';
+
+            // Render Mermaid only when schema is visible
+            if (sectionId === 'schema') {
+                renderSchemaMermaid();
+            }
+        }
+
+        // Initialize Charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // If the schema section ever becomes the initial view, render it.
+            if (document.getElementById('schema-section')?.style.display !== 'none') {
+                renderSchemaMermaid();
+            }
+            
+            // Chart 1: Vehicle Status (Doughnut)
+            const ctxStatus = document.getElementById('fleetStatusChart').getContext('2d');
+            new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Disponible', 'En maintenance', 'Hors service', 'Loué'],
+                    datasets: [{
+                        data: [65, 15, 5, 15], // Mock data based on trends
+                        backgroundColor: ['#2ecc71', '#f1c40f', '#e74c3c', '#3498db']
+                    }]
+                },
+                options: { responsive: true }
+            });
+
+            // Chart 2: Vehicles by City (Bar)
+            const ctxCity = document.getElementById('cityChart').getContext('2d');
+            new Chart(ctxCity, {
+                type: 'bar',
+                data: {
+                    labels: ['Paris', 'Lyon', 'Marseille', 'Bordeaux', 'Lille', 'Nantes'],
+                    datasets: [{
+                        label: 'Nombre de Véhicules',
+                        data: [45, 30, 25, 20, 15, 18],
+                        backgroundColor: '#316192'
+                    }]
+                },
+                options: {
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
