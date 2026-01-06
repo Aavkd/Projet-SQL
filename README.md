@@ -26,11 +26,21 @@ Clara_Mobility_sql/
 │   ├── MCD.md                       # Modèle Conceptuel de Données
 │   ├── MLD.md                       # Modèle Logique de Données
 │   └── dictionnaire_donnees.md      # Description des attributs
-├── 📁 scripts/
+├── 📁 front/
+│   ├── index.html                   # Interface visualisation
+│   ├── app.js                       # Logique JavaScript
+│   └── style.css                    # Styles CSS
+├── 📁 init-db/                      # 🐳 Scripts Docker (auto-exécutés)
+│   ├── 01_create_tables.sql
+│   ├── 02_insert_data.sql
+│   └── 03_queries.sql
+├── 📁 scripts/                      # 💻 Scripts installation manuelle
 │   ├── 01_create_database.sql       # Création de la base
 │   ├── 02_create_tables.sql         # Structure des tables
 │   ├── 03_insert_data.sql           # Données de test
 │   └── 04_queries.sql               # Requêtes avancées
+├── .env.example                     # 🐳 Template configuration Docker
+├── docker-compose.yml               # 🐳 Configuration Docker Compose
 └── README.md
 ```
 
@@ -67,12 +77,68 @@ erDiagram
 
 ## 🚀 Installation
 
-### Prérequis
+Deux méthodes d'installation sont disponibles. Choisissez celle qui convient le mieux à votre environnement.
+
+---
+
+### 🐳 Méthode 1 : Docker (Recommandée)
+
+Installation rapide avec Docker Compose. La base de données est automatiquement créée et initialisée.
+
+#### Prérequis
+
+- [Docker](https://www.docker.com/get-started) et Docker Compose installés
+- Port 5432 disponible
+
+#### Démarrage rapide
+
+```bash
+# Cloner le dépôt
+git clone https://github.com/[votre-username]/Clara_Mobility_sql.git
+cd Clara_Mobility_sql
+
+# (Optionnel) Personnaliser les identifiants
+cp .env.example .env
+# Éditer .env avec votre mot de passe
+
+# Démarrer PostgreSQL
+docker-compose up -d
+
+# Vérifier que le conteneur fonctionne
+docker-compose ps
+```
+
+#### Connexion à la base
+
+```bash
+# Via psql dans le conteneur
+docker-compose exec postgres psql -U ciara_admin -d ciara_mobility
+
+# Ou depuis votre machine (si psql installé)
+psql -h localhost -U ciara_admin -d ciara_mobility
+```
+
+#### Commandes utiles
+
+| Commande | Description |
+|----------|-------------|
+| `docker-compose up -d` | Démarrer en arrière-plan |
+| `docker-compose down` | Arrêter les conteneurs |
+| `docker-compose logs -f postgres` | Voir les logs |
+| `docker-compose down -v` | Supprimer + effacer les données |
+
+---
+
+### 💻 Méthode 2 : Installation Manuelle (Legacy)
+
+Installation traditionnelle avec PostgreSQL installé localement. Plus de contrôle mais configuration manuelle.
+
+#### Prérequis
 
 - PostgreSQL 14+ installé
 - Client psql ou pgAdmin
 
-### Étapes d'installation
+#### Étapes d'installation
 
 1. **Cloner le dépôt**
 ```bash
@@ -100,7 +166,7 @@ psql -U postgres -d ciara_mobility -f scripts/03_insert_data.sql
 psql -U postgres -d ciara_mobility -f scripts/04_queries.sql
 ```
 
-### Connexion à la base
+#### Connexion à la base
 
 ```bash
 psql -U postgres -d ciara_mobility

@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ciara_mobility_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ciara_mobility}
+      POSTGRES_USER: ${POSTGRES_USER:-ciara_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ciara_secret_2026}
+      # Use C.UTF-8 locale (compatible with Alpine)
+      LANG: C.UTF-8
+      LC_COLLATE: C.UTF-8
+      LC_CTYPE: C.UTF-8
+    ports:
+      - "5432:5432"
+    volumes:
+      # Persistent data storage
+      - ciara_pgdata:/var/lib/postgresql/data
+      # Auto-initialization scripts (run in alphabetical order)
+      - ./init-db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ciara_admin} -d ${POSTGRES_DB:-ciara_mobility}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  ciara_pgdata:
+    name: ciara_mobility_data
