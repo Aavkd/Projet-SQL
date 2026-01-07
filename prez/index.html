@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>clAra Mobility - Présentation SQL B2</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="background">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <!-- Slide Number Indicator -->
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">6</span>
+    </div>
+
+    <!-- Presentation Container -->
+    <div class="presentation">
+        <div class="slides-container" id="slidesContainer">
+
+            <!-- SLIDE 1: Title -->
+            <div class="slide title-slide active" data-slide="1">
+                <div class="slide-content">
+                    <div class="logo-container animate-in">
+                        <div class="logo-text">Projet SQL B2</div>
+                    </div>
+
+                    <h1 class="animate-in">cl<span class="highlight">A</span>ra Mobility</h1>
+
+                    <p class="subtitle animate-in">
+                        Système de gestion de locations de véhicules électriques partagés
+                    </p>
+
+                    <div class="flex justify-center mt-8 animate-in">
+                        <div class="glass-card glass-card-sm" style="text-align: center; max-width: 600px;">
+                            <p style="margin-bottom: 24px; font-size: 1.1rem;">
+                                Une start-up innovante dans la <span class="highlight">mobilité urbaine durable</span>
+                            </p>
+                            <div class="flex justify-center gap-6">
+                                <div class="badge">🚗 Voitures</div>
+                                <div class="badge">🛵 Scooters</div>
+                                <div class="badge">🛴 Trottinettes</div>
+                                <div class="badge">🚲 Vélos</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center mt-8 animate-in">
+                        <div style="text-align: center;">
+                            <p class="text-muted" style="color: var(--text-muted); font-size: 0.95rem;">
+                                Présenté par : <span style="color: var(--text-secondary);">Rodolphe et Alexy</span>
+                            </p>
+                            <p class="text-muted" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 8px;">
+                                Ynov B2 Informatique • Janvier 2026
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 2: MCD -->
+            <div class="slide" data-slide="2">
+                <div class="slide-content">
+                    <h2 class="animate-in">📐 Analyse et Modélisation (MCD)</h2>
+
+                    <div class="grid-2">
+                        <div class="glass-card animate-in">
+                            <h3>10 Entités Principales</h3>
+                            <div class="entity-diagram">
+                                <div class="entity main">VEHICULES</div>
+                                <div class="entity">TYPES_VEHICULES</div>
+                                <div class="entity">STATIONS</div>
+                                <div class="entity">BORNES</div>
+                                <div class="entity">CLIENTS</div>
+                                <div class="entity">LOCATIONS</div>
+                                <div class="entity">PAIEMENTS</div>
+                                <div class="entity">TECHNICIENS</div>
+                                <div class="entity">INTERVENTIONS</div>
+                                <div class="entity">SESSIONS_RECHARGE</div>
+                            </div>
+
+                            <div class="mt-6">
+                                <h4>Relations clés</h4>
+                                <ul>
+                                    <li><span class="highlight">VEHICULES</span> → lié au TYPE pour les tarifications
+                                    </li>
+                                    <li><span class="highlight">VEHICULES</span> → localisé dans une STATION</li>
+                                    <li><span class="highlight">BORNES</span> → physiquement liées aux STATIONS</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="glass-card animate-in">
+                            <h3>🛡️ Intégrité des Données</h3>
+
+                            <div class="glass-card glass-card-sm mt-4"
+                                style="background: rgba(0, 255, 136, 0.1); border-color: rgba(0, 255, 136, 0.3);">
+                                <h4 style="color: var(--accent);">✓ Règle Métier #1</h4>
+                                <p style="font-size: 1rem;">Un véhicule <strong>ne peut pas être loué</strong> s'il est
+                                    en maintenance</p>
+                            </div>
+
+                            <div class="glass-card glass-card-sm mt-4"
+                                style="background: rgba(0, 212, 255, 0.1); border-color: rgba(0, 212, 255, 0.3);">
+                                <h4 style="color: var(--accent-blue);">✓ Règle Métier #2</h4>
+                                <p style="font-size: 1rem;">Une borne de recharge est <strong>physiquement liée</strong>
+                                    à une station</p>
+                            </div>
+
+                            <div class="glass-card glass-card-sm mt-4"
+                                style="background: rgba(118, 75, 162, 0.2); border-color: rgba(118, 75, 162, 0.4);">
+                                <h4 style="color: var(--gradient-mid);">✓ Suivi Complet</h4>
+                                <p style="font-size: 1rem;">INTERVENTIONS + SESSIONS_RECHARGE = <strong>cycle de vie
+                                        complet</strong></p>
+                            </div>
+
+                            <p class="mt-6" style="font-style: italic; color: var(--text-muted);">
+                                Modélisation stricte selon la méthode <span class="highlight">Merise</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 3: Architecture -->
+            <div class="slide" data-slide="3">
+                <div class="slide-content">
+                    <h2 class="animate-in">🏗️ Architecture Technique</h2>
+
+                    <div class="tech-stack animate-in">
+                        <div class="tech-item">
+                            <div style="font-size: 4rem;">🐘</div>
+                            <p style="font-weight: 600; color: var(--text-primary);">PostgreSQL 16</p>
+                        </div>
+                        <div style="font-size: 2rem; color: var(--text-muted);">+</div>
+                        <div class="tech-item">
+                            <div style="font-size: 4rem;">🐳</div>
+                            <p style="font-weight: 600; color: var(--text-primary);">Docker</p>
+                        </div>
+                        <div style="font-size: 2rem; color: var(--text-muted);">=</div>
+                        <div class="tech-item">
+                            <div style="font-size: 4rem;">🚀</div>
+                            <p style="font-weight: 600; color: var(--accent);">Déploiement Instantané</p>
+                        </div>
+                    </div>
+
+                    <div class="grid-2 mt-6">
+                        <div class="glass-card animate-in">
+                            <h3>📦 Docker Compose</h3>
+                            <div class="code-block">
+                                <code>
+<span class="code-keyword">version</span>: <span class="code-string">'3.8'</span>
+<span class="code-keyword">services</span>:
+  <span class="code-function">postgres</span>:
+    <span class="code-keyword">image</span>: postgres:<span class="code-number">16</span>-alpine
+    <span class="code-keyword">environment</span>:
+      <span class="code-keyword">POSTGRES_DB</span>: ciara_mobility
+      <span class="code-keyword">POSTGRES_USER</span>: ciara_admin
+    <span class="code-keyword">volumes</span>:
+      - ./init-db:/docker-entrypoint-initdb.d
+    <span class="code-keyword">ports</span>:
+      - <span class="code-string">"5432:5432"</span>
+                                </code>
+                            </div>
+                            <p class="mt-4" style="font-size: 0.95rem;">
+                                <span class="highlight">→</span> Environnement reproductible instantanément
+                            </p>
+                        </div>
+
+                        <div class="glass-card animate-in">
+                            <h3>🔒 Contraintes SQL</h3>
+                            <p>La base de données est le <span class="highlight">dernier garant</span> de la qualité de
+                                la donnée</p>
+
+                            <div class="code-block mt-4">
+                                <code>
+<span class="code-comment">-- Clés étrangères</span>
+<span class="code-keyword">FOREIGN KEY</span> (id_station) 
+    <span class="code-keyword">REFERENCES</span> stations(id_station)
+
+<span class="code-comment">-- Contraintes CHECK</span>
+<span class="code-keyword">CHECK</span> (tarif_minute > <span class="code-number">0</span>)
+<span class="code-keyword">CHECK</span> (date_fin > date_debut)
+<span class="code-keyword">CHECK</span> (autonomie >= <span class="code-number">0</span>)
+                                </code>
+                            </div>
+
+                            <div class="flex gap-4 mt-4">
+                                <div class="badge">FK</div>
+                                <div class="badge">CHECK</div>
+                                <div class="badge">NOT NULL</div>
+                                <div class="badge">UNIQUE</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 4: Triggers & Functions -->
+            <div class="slide" data-slide="4">
+                <div class="slide-content">
+                    <h2 class="animate-in">⚡ Fonctionnalités Avancées</h2>
+                    <p class="animate-in" style="font-size: 1.3rem; margin-bottom: 24px;">
+                        Une base de données <span class="highlight">"intelligente"</span> grâce à l'automatisation
+                    </p>
+
+                    <div class="grid-2">
+                        <div class="glass-card animate-in">
+                            <h3>🔄 Triggers - Automatisation</h3>
+                            <p style="margin-bottom: 16px;">Mise à jour automatique du statut véhicule lors d'une
+                                intervention</p>
+
+                            <div class="code-block">
+                                <code>
+<span class="code-keyword">CREATE TRIGGER</span> trg_update_vehicule_status
+<span class="code-keyword">AFTER INSERT ON</span> interventions
+<span class="code-keyword">FOR EACH ROW</span>
+<span class="code-keyword">EXECUTE FUNCTION</span> <span class="code-function">update_vehicule_status</span>();
+
+<span class="code-comment">-- Quand une intervention est créée</span>
+<span class="code-comment">-- → Le véhicule passe en 'Maintenance'</span>
+<span class="code-comment">-- → Évite les erreurs humaines</span>
+                                </code>
+                            </div>
+
+                            <div class="mt-4 glass-card glass-card-sm" style="background: rgba(0, 255, 136, 0.1);">
+                                <p style="font-size: 0.95rem; margin: 0;">
+                                    <span class="highlight">✓</span> Garantit la cohérence des données automatiquement
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="glass-card animate-in">
+                            <h3>🧮 Fonctions - Logique Métier</h3>
+                            <p style="margin-bottom: 16px;">Calcul centralisé du coût de location</p>
+
+                            <div class="code-block">
+                                <code>
+<span class="code-keyword">CREATE FUNCTION</span> <span class="code-function">fn_calculer_cout_location</span>(
+    duree_min <span class="code-keyword">INT</span>,
+    distance_km <span class="code-keyword">DECIMAL</span>,
+    type_id <span class="code-keyword">INT</span>
+) <span class="code-keyword">RETURNS DECIMAL AS</span> $$
+<span class="code-keyword">DECLARE</span>
+    tarif_min <span class="code-keyword">DECIMAL</span>;
+    tarif_km <span class="code-keyword">DECIMAL</span>;
+<span class="code-keyword">BEGIN</span>
+    <span class="code-keyword">SELECT</span> tarif_minute, tarif_km
+    <span class="code-keyword">INTO</span> tarif_min, tarif_km
+    <span class="code-keyword">FROM</span> types_vehicules
+    <span class="code-keyword">WHERE</span> id_type = type_id;
+    
+    <span class="code-keyword">RETURN</span> (duree_min * tarif_min) 
+         + (distance_km * tarif_km);
+<span class="code-keyword">END</span>;
+$$ <span class="code-keyword">LANGUAGE</span> plpgsql;
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center gap-8 mt-6 animate-in">
+                        <div class="glass-card glass-card-sm" style="text-align: center;">
+                            <div style="font-size: 2rem;">🔐</div>
+                            <p style="margin: 8px 0 0; font-size: 0.95rem;">Sécurité</p>
+                        </div>
+                        <div class="glass-card glass-card-sm" style="text-align: center;">
+                            <div style="font-size: 2rem;">♻️</div>
+                            <p style="margin: 8px 0 0; font-size: 0.95rem;">Réutilisabilité</p>
+                        </div>
+                        <div class="glass-card glass-card-sm" style="text-align: center;">
+                            <div style="font-size: 2rem;">🎯</div>
+                            <p style="margin: 8px 0 0; font-size: 0.95rem;">Centralisation</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 5: Data Exploitation -->
+            <div class="slide" data-slide="5">
+                <div class="slide-content">
+                    <h2 class="animate-in">📊 Exploitation de la Donnée</h2>
+                    <p class="animate-in" style="font-size: 1.2rem; margin-bottom: 24px;">
+                        Vues et requêtes analytiques pour la <span class="highlight">prise de décision</span>
+                    </p>
+
+                    <div class="grid-2">
+                        <div class="glass-card animate-in">
+                            <h3>👁️ Vues Prédéfinies</h3>
+                            <p style="margin-bottom: 20px;">Simplifier l'accès aux données complexes</p>
+
+                            <div class="glass-card glass-card-sm" style="background: rgba(102, 126, 234, 0.15);">
+                                <h4 style="color: var(--gradient-start);">vue_tableau_bord_vehicules</h4>
+                                <p style="font-size: 0.95rem; margin: 0;">Dashboard complet des véhicules avec état,
+                                    autonomie et localisation</p>
+                            </div>
+
+                            <div class="glass-card glass-card-sm mt-4" style="background: rgba(0, 212, 255, 0.15);">
+                                <h4 style="color: var(--accent-blue);">vue_activite_clients</h4>
+                                <p style="font-size: 0.95rem; margin: 0;">Statistiques d'activité et historique par
+                                    client</p>
+                            </div>
+
+                            <div class="code-block mt-4">
+                                <code>
+<span class="code-keyword">SELECT</span> * <span class="code-keyword">FROM</span> vue_tableau_bord_vehicules
+<span class="code-keyword">WHERE</span> etat = <span class="code-string">'Disponible'</span>
+<span class="code-keyword">AND</span> ville = <span class="code-string">'Paris'</span>;
+                                </code>
+                            </div>
+                        </div>
+
+                        <div class="glass-card animate-in">
+                            <h3>📈 Requêtes Analytiques</h3>
+
+                            <div class="glass-card glass-card-sm" style="background: rgba(0, 255, 136, 0.1);">
+                                <h4>🏆 Top 5 Clients les plus actifs</h4>
+                                <div class="code-block" style="margin-top: 12px;">
+                                    <code>
+<span class="code-keyword">SELECT</span> c.nom, c.prenom, 
+       <span class="code-function">COUNT</span>(l.id_location) <span class="code-keyword">AS</span> locations
+<span class="code-keyword">FROM</span> clients c
+<span class="code-keyword">LEFT JOIN</span> locations l 
+    <span class="code-keyword">ON</span> c.id_client = l.id_client
+<span class="code-keyword">GROUP BY</span> c.id_client
+<span class="code-keyword">ORDER BY</span> locations <span class="code-keyword">DESC</span>
+<span class="code-keyword">LIMIT</span> <span class="code-number">5</span>;
+                                    </code>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <h4>Autres analyses disponibles :</h4>
+                                <ul>
+                                    <li>Taux d'occupation des stations par ville</li>
+                                    <li>Maintenance prédictive (autonomies faibles)</li>
+                                    <li>Revenus par type de véhicule</li>
+                                    <li>Heures de pointe des locations</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center mt-6 animate-in">
+                        <div class="glass-card glass-card-sm flex items-center gap-6" style="padding: 16px 32px;">
+                            <span style="font-size: 2rem;">🎯</span>
+                            <p style="margin: 0; font-size: 1.1rem;">
+                                Vision <span class="highlight">claire et temps réel</span> de l'activité pour l'équipe
+                                clAra Mobility
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 6: Conclusion -->
+            <div class="slide" data-slide="6">
+                <div class="slide-content">
+                    <div style="text-align: center;">
+                        <h2 class="animate-in" style="font-size: 3rem;">🎉 Conclusion</h2>
+                        <p class="animate-in subtitle" style="margin-bottom: 40px;">
+                            Une solution <span class="highlight">complète</span> et <span class="highlight-blue">prête à
+                                l'échelle</span>
+                        </p>
+                    </div>
+
+                    <div class="stats-grid animate-in">
+                        <div class="glass-card stat-card">
+                            <div class="stat-number">10</div>
+                            <div class="stat-label">Entités</div>
+                        </div>
+                        <div class="glass-card stat-card">
+                            <div class="stat-number">200+</div>
+                            <div class="stat-label">Véhicules</div>
+                        </div>
+                        <div class="glass-card stat-card">
+                            <div class="stat-number">5+</div>
+                            <div class="stat-label">Triggers & Fonctions</div>
+                        </div>
+                        <div class="glass-card stat-card">
+                            <div class="stat-number">🐳</div>
+                            <div class="stat-label">Déploiement Docker</div>
+                        </div>
+                    </div>
+
+                    <div class="grid-3 mt-8 animate-in">
+                        <div class="glass-card feature-card">
+                            <div style="font-size: 3rem;">📐</div>
+                            <h4 style="margin-top: 16px;">Modélisation</h4>
+                            <p style="font-size: 0.95rem; margin: 0;">Du MCD au schéma SQL complet</p>
+                        </div>
+                        <div class="glass-card feature-card">
+                            <div style="font-size: 3rem;">⚡</div>
+                            <h4 style="margin-top: 16px;">Automatisation</h4>
+                            <p style="font-size: 0.95rem; margin: 0;">Triggers et fonctions métier</p>
+                        </div>
+                        <div class="glass-card feature-card">
+                            <div style="font-size: 3rem;">📊</div>
+                            <h4 style="margin-top: 16px;">Exploitation</h4>
+                            <p style="font-size: 0.95rem; margin: 0;">Vues et requêtes analytiques</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center mt-8 animate-in">
+                        <div class="glass-card" style="text-align: center; padding: 32px 64px;">
+                            <h3 style="margin-bottom: 16px; font-size: 1.8rem;">Merci de votre attention</h3>
+                            <p style="font-size: 1.2rem; margin-bottom: 24px; color: var(--text-secondary);">
+                                Nous sommes disponibles pour répondre à vos <span class="highlight">questions</span>
+                            </p>
+                            <div class="flex justify-center gap-4">
+                                <div class="badge" style="background: linear-gradient(135deg, var(--accent), #00b377);">
+                                    💬 Questions ?
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Navigation Controls -->
+    <nav class="nav-controls">
+        <button class="nav-btn" id="prevBtn" aria-label="Previous slide">←</button>
+        <div class="slide-indicators" id="slideIndicators"></div>
+        <button class="nav-btn" id="nextBtn" aria-label="Next slide">→</button>
+    </nav>
+
+    <script>
+        /**
+         * clAra Mobility Presentation - Navigation System
+         */
+        class Presentation {
+            constructor() {
+                this.currentSlide = 0;
+                this.slides = document.querySelectorAll('.slide');
+                this.totalSlides = this.slides.length;
+                this.isAnimating = false;
+
+                this.init();
+            }
+
+            init() {
+                this.setupNavigation();
+                this.setupKeyboardNavigation();
+                this.createIndicators();
+                this.updateSlideNumber();
+            }
+
+            setupNavigation() {
+                document.getElementById('prevBtn').addEventListener('click', () => this.prevSlide());
+                document.getElementById('nextBtn').addEventListener('click', () => this.nextSlide());
+                this.updateNavButtons();
+            }
+
+            setupKeyboardNavigation() {
+                document.addEventListener('keydown', (e) => {
+                    switch (e.key) {
+                        case 'ArrowRight':
+                        case ' ':
+                        case 'Enter':
+                            e.preventDefault();
+                            this.nextSlide();
+                            break;
+                        case 'ArrowLeft':
+                        case 'Backspace':
+                            e.preventDefault();
+                            this.prevSlide();
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            this.goToSlide(0);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            this.goToSlide(this.totalSlides - 1);
+                            break;
+                    }
+                });
+
+                // Touch/swipe support
+                let touchStartX = 0;
+                document.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                });
+                document.addEventListener('touchend', (e) => {
+                    const diff = touchStartX - e.changedTouches[0].screenX;
+                    if (Math.abs(diff) > 50) {
+                        diff > 0 ? this.nextSlide() : this.prevSlide();
+                    }
+                });
+            }
+
+            createIndicators() {
+                const container = document.getElementById('slideIndicators');
+                for (let i = 0; i < this.totalSlides; i++) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'indicator' + (i === 0 ? ' active' : '');
+                    indicator.addEventListener('click', () => this.goToSlide(i));
+                    container.appendChild(indicator);
+                }
+            }
+
+            updateIndicators() {
+                document.querySelectorAll('.indicator').forEach((ind, i) => {
+                    ind.classList.toggle('active', i === this.currentSlide);
+                });
+            }
+
+            updateNavButtons() {
+                document.getElementById('prevBtn').disabled = this.currentSlide === 0;
+                document.getElementById('nextBtn').disabled = this.currentSlide === this.totalSlides - 1;
+            }
+
+            updateSlideNumber() {
+                document.getElementById('currentSlide').textContent = this.currentSlide + 1;
+            }
+
+            showSlide(index) {
+                if (this.isAnimating || index < 0 || index >= this.totalSlides) return;
+                this.isAnimating = true;
+                this.currentSlide = index;
+
+                this.slides.forEach((slide, i) => {
+                    slide.classList.remove('active', 'prev');
+                    if (i === index) slide.classList.add('active');
+                    else if (i < index) slide.classList.add('prev');
+                });
+
+                this.updateSlideNumber();
+                this.updateIndicators();
+                this.updateNavButtons();
+
+                setTimeout(() => { this.isAnimating = false; }, 600);
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.totalSlides - 1) this.goToSlide(this.currentSlide + 1);
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) this.goToSlide(this.currentSlide - 1);
+            }
+
+            goToSlide(index) {
+                if (index !== this.currentSlide) this.showSlide(index);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => new Presentation());
+    </script>
+</body>
+
+</html>
